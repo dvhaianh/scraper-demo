@@ -10,6 +10,11 @@ api.get('/', (req, res) => {
 api.post('/', async (req, res) => {
     const {keyword} = req.body
     const data = await crawl(keyword)
+    if (!data) {
+        res.json({
+            message: 'failed'
+        })
+    }
     res.json({
         message: 'success',
         data

@@ -2,6 +2,7 @@ require('dotenv').config()
 
 const createError = require('http-errors')
 const path = require('path')
+const mongoose = require('mongoose')
 
 const express = require('express')
 const cookieParser = require('cookie-parser')
@@ -13,6 +14,20 @@ app.listen(process.env.PORT || 3000, () => {
     console.log(`SERVER LISTENGING ON PORT ${process.env.PORT || 3000}`)
 })
 
+mongoose.connect(process.env.DB_PATH,
+    {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false,
+        useCreateIndex: true
+    },
+    (err) => {
+        if (err) {
+            console.log(`ERROR: ${err.message}`);
+        } else {
+            console.log(`DATABASE CONNECTED`)
+        }
+    })
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
