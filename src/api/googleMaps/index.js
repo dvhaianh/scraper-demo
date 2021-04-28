@@ -10,15 +10,16 @@ api.get('/', (req, res) => {
 api.post('/', async (req, res) => {
     const {keyword} = req.body
     const data = await crawl(keyword)
-    if (!data) {
+    if (data) {
         res.json({
-            message: 'failed'
+            success: true,
+            data
+        })
+    } else {
+        res.json({
+            success: false
         })
     }
-    res.json({
-        message: 'success',
-        data
-    })
 })
 
 module.exports = api

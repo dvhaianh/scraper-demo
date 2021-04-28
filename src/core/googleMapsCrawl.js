@@ -1,4 +1,12 @@
-const puppeteer = require('puppeteer')
+const puppeteer = require('puppeteer-extra')
+
+const getReviewImage = () => {
+    try {
+        
+    } catch (e){
+        return null
+    }
+}
 
 module.exports = async (place) => {
     const browser = await puppeteer.launch({
@@ -20,44 +28,85 @@ module.exports = async (place) => {
 
     try {
         const data = await page.evaluate(() => {
-            const reviewImage = document.querySelector('.section-hero-header-image-hero-container>button>img').getAttribute('src') || null
-            const title = document.querySelector('h1.section-hero-header-title-title>span:first-child').textContent.trim() || null
-            const rating = parseFloat(document.querySelector('.section-star-display').textContent.trim()) || null
-            const address = document.querySelector('div.ugiz4pqJLAG__text').textContent.trim() || null
-            const reviews = []
+            const title = (() => {
+                try {
+                    return document.querySelector('h1.section-hero-header-title-title>span:first-child').textContent.trim().toLowerCase()
+                } catch (e) {
+                    throw new Error('Can not found')
+                }
+            })()
 
-            const avatars = document.querySelectorAll('img.section-review-reviewer-image')
-            avatars.forEach((img, index) => {
-                const avatar = img.getAttribute('src')
-                reviews[index] = Object.assign({}, reviews[index], {avatar})
-            })
-            const reviewerSpans = document.querySelectorAll('div.section-review-title>span')
-            reviewerSpans.forEach((span, index) => {
-                const reviewer = span.textContent
-                reviews[index] = Object.assign({}, reviews[index], {reviewer})
-            })
-            const rates = document.querySelectorAll('span.section-review-stars')
-            rates.forEach((span, index) => {
-                const rate = span.getAttribute('aria-label').trim()
-                reviews[index] = Object.assign({}, reviews[index], {rate})
-            })
-            const comments = document.querySelectorAll('span.section-review-text')
-            comments.forEach((span, index) => {
-                const comment = span.textContent
-                reviews[index] = Object.assign({}, reviews[index], {comment})
-            })
+            const reviewImage = (() => {
+                try {
+                    return document.querySelector('.section-hero-header-image-hero-container>button>img').getAttribute('src')
+                } catch (e) {
+                    return null
+                }
+            })()
+
+            const category = (() => {
+                try {
+                    return document.querySelector('button[jsaction="pane.rating.category"]').textContent.trim().toUpperCase()
+                } catch (e) {
+                    return null
+                }
+            })()
+
+            const rating = (() => {
+                try {
+                    return parseFloat(document.querySelector('div.gm2-display-2').textContent.trim())
+                } catch (e) {
+                    return null
+                }
+            })()
+
+            const address = (() => {
+                try {
+                    return document.querySelector('div.ugiz4pqJLAG__text').textContent.trim().toLowerCase()
+                } catch (e) {
+                    return null
+                }
+            })()
+
+            const reviews = (() => {
+                const temp = []
+                const avatars = document.querySelectorAll('img.section-review-reviewer-image')
+                avatars.forEach((img, index) => {
+                    const avatar = img.getAttribute('src')
+                    temp[index] = Object.assign({}, temp[index], {avatar})
+                })
+                const reviewerSpans = document.querySelectorAll('div.section-review-title>span')
+                reviewerSpans.forEach((span, index) => {
+                    const reviewer = span.textContent
+                    temp[index] = Object.assign({}, temp[index], {reviewer})
+                })
+                const rates = document.querySelectorAll('span.section-review-stars')
+                rates.forEach((span, index) => {
+                    const rate = span.getAttribute('aria-label').trim()
+                    temp[index] = Object.assign({}, temp[index], {rate})
+                })
+                const comments = document.querySelectorAll('span.section-review-text')
+                comments.forEach((span, index) => {
+                    const comment = span.textContent
+                    temp[index] = Object.assign({}, temp[index], {comment})
+                })
+                return temp
+            })()
+
             return {
-                reviewImage,
                 title,
+                reviewImage,
                 rating,
+                category,
                 address,
                 reviews
             }
         })
         await browser.close()
-        console.log(data)
+        console.log({data})
         return data
     } catch (error) {
+        console.log("NO INFORMATION");
         return null
     }
 }
