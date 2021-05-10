@@ -51,9 +51,11 @@ module.exports.filtering = async args => {
     }
 
     console.log(conditions)
-    const find = await places.find({
-        $and: conditions
-    })
+    const find = await places
+        .find({
+            $and: conditions
+        })
+        .select('title image rating')
 
     return find.length > 0 ? find : null
 }
