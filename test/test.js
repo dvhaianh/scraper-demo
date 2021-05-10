@@ -1,5 +1,4 @@
-const crawl = require('../src/core/googleMapsCrawl')
+const camelCase = require('../src/helpers/validateTitle')
 
-setImmediate(async () => {
-    await crawl('Ha Long Bay')
-})
+const v = camelCase('    ha loNG BaY   ')
+console.log(v);

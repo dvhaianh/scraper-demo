@@ -1,12 +1,5 @@
 const puppeteer = require('puppeteer-extra')
-
-const getReviewImage = () => {
-    try {
-        
-    } catch (e){
-        return null
-    }
-}
+const validateTitle = require('../helpers/validateTitle')
 
 module.exports = async (place) => {
     const browser = await puppeteer.launch({
@@ -24,19 +17,19 @@ module.exports = async (place) => {
     await page.type(inp_search, place, {delay: 5})
     const btn_search = 'div.searchbox-searchbutton-container>button'
     await page.click(btn_search)
-    await page.waitForTimeout(4000)
+    await page.waitForTimeout(5000)
 
     try {
-        const data = await page.evaluate(() => {
+        const data = await page.evaluate(async () => {
             const title = (() => {
                 try {
-                    return document.querySelector('h1.section-hero-header-title-title>span:first-child').textContent.trim().toLowerCase()
+                    return document.querySelector('h1.section-hero-header-title-title>span:first-child').textContent.trim().split(' ').join('')
                 } catch (e) {
                     throw new Error('Can not found')
                 }
             })()
 
-            const reviewImage = (() => {
+            const image = (() => {
                 try {
                     return document.querySelector('.section-hero-header-image-hero-container>button>img').getAttribute('src')
                 } catch (e) {
@@ -46,7 +39,7 @@ module.exports = async (place) => {
 
             const category = (() => {
                 try {
-                    return document.querySelector('button[jsaction="pane.rating.category"]').textContent.trim().toUpperCase()
+                    return document.querySelector('button[jsaction="pane.rating.category"]').textContent.trim().toLowerCase()
                 } catch (e) {
                     return null
                 }
@@ -62,7 +55,7 @@ module.exports = async (place) => {
 
             const address = (() => {
                 try {
-                    return document.querySelector('div.ugiz4pqJLAG__text').textContent.trim().toLowerCase()
+                    return document.querySelector('div.mapsConsumerUiSubviewSectionGm2Listitem__text>div').textContent.trim().toLowerCase()
                 } catch (e) {
                     return null
                 }
@@ -95,7 +88,7 @@ module.exports = async (place) => {
 
             return {
                 title,
-                reviewImage,
+                image,
                 rating,
                 category,
                 address,
